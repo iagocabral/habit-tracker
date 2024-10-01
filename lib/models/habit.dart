@@ -1,11 +1,14 @@
 class Habit {
-  final String id;
+  String id;
   final String name;
   final int targetPerWeek;
   final List<DateTime> completedDays;
   final String category;
   final bool notificationsEnabled;
-  final String userId; // Novo campo para armazenar o ID do usuário
+  final String userId;
+  final List<String> daysOfWeek; // Dias da semana em que o hábito deve ser realizado (Seg, Ter, etc.)
+  final Map<String, String> notes; // Anotações para cada dia da semana
+  final Map<String, bool> isCompleted; // Status de feito para cada dia da semana
 
   Habit({
     required this.id,
@@ -14,10 +17,31 @@ class Habit {
     required this.completedDays,
     required this.category,
     required this.notificationsEnabled,
-    required this.userId, // Inclui o userId no construtor
+    required this.userId,
+    required this.daysOfWeek,
+    required this.notes,
+    required this.isCompleted,
   });
 
-  // Método para converter um Habit em um Map (para armazenar no Firestore)
+  // Método para converter um Map em um Habit
+  static Habit fromMap(Map<String, dynamic> map) {
+    return Habit(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      targetPerWeek: map['targetPerWeek'] ?? 0,
+      completedDays: List<DateTime>.from(
+        (map['completedDays'] ?? []).map((day) => DateTime.parse(day)),
+      ),
+      category: map['category'] ?? 'Sem categoria',
+      notificationsEnabled: map['notificationsEnabled'] ?? false,
+      userId: map['userId'] ?? '',
+      daysOfWeek: List<String>.from(map['daysOfWeek'] ?? []),
+      notes: Map<String, String>.from(map['notes'] ?? {}),
+      isCompleted: Map<String, bool>.from(map['isCompleted'] ?? {}),
+    );
+  }
+
+  // Método para converter Habit em Map (usado para salvar no Firestore)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -26,22 +50,10 @@ class Habit {
       'completedDays': completedDays.map((day) => day.toIso8601String()).toList(),
       'category': category,
       'notificationsEnabled': notificationsEnabled,
-      'userId': userId, // Inclui o userId no mapa
+      'userId': userId,
+      'daysOfWeek': daysOfWeek,
+      'notes': notes,
+      'isCompleted': isCompleted,
     };
-  }
-
-  // Método para converter um Map em um Habit (quando buscar do Firestore)
-  static Habit fromMap(Map<String, dynamic> map) {
-    return Habit(
-      id: map['id'],
-      name: map['name'],
-      targetPerWeek: map['targetPerWeek'],
-      completedDays: List<DateTime>.from(
-        map['completedDays'].map((day) => DateTime.parse(day)),
-      ),
-      category: map['category'],
-      notificationsEnabled: map['notificationsEnabled'],
-      userId: map['userId'], // Recupera o userId do mapa
-    );
   }
 }

@@ -3,7 +3,8 @@ import '../services/auth_service.dart';
 import '../models/habit.dart';
 import '../viewmodels/habit_viewmodel.dart';
 import 'add_habit_view.dart';
-import 'login_view.dart'; // Certifique-se de importar a tela de login
+import 'login_view.dart';
+import 'routine_view.dart'; // Importe a tela de rotina
 
 class HabitListView extends StatelessWidget {
   final HabitViewModel habitViewModel = HabitViewModel();
@@ -28,7 +29,22 @@ class HabitListView extends StatelessWidget {
                 (Route<dynamic> route) => false, // Remove todas as rotas anteriores
               );
             },
-          )
+          ),
+          IconButton(
+            icon: Icon(Icons.calendar_today), // Ícone para acessar a rotina diária
+            onPressed: () {
+              // Navega para a tela de rotina diária
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RoutineView(
+                    userId: userId,
+                    habitViewModel: habitViewModel,
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: StreamBuilder<List<Habit>>(
